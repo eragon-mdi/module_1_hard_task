@@ -1,5 +1,7 @@
 package cache
 
+import "sync"
+
 // Interface - реализуйте этот интерфейс
 type Interface interface {
 	Set(k, v string)
@@ -7,23 +9,27 @@ type Interface interface {
 }
 
 // Не меняйте названия структуры и название метода создания экземпляра Cache, иначе не будут проходить тесты
-
 type Cache struct {
-	// TODO: ваш код
+	cache sync.Map
 }
 
 // NewCache создаёт и возвращает новый экземпляр Cache.
 func NewCache() Interface {
-	// TODO: ваш код
-	panic("implement me")
+	return &Cache{
+		cache: sync.Map{},
+	}
 }
 
-func (c Cache) Set(k, v string) {
-	// TODO implement me
-	panic("implement me")
+func (c *Cache) Set(k, v string) {
+	c.cache.Store(k, v)
 }
 
-func (c Cache) Get(k string) (v string, ok bool) {
-	// TODO implement me
-	panic("implement me")
+func (c *Cache) Get(k string) (v string, ok bool) {
+	val, stored := c.cache.Load(k)
+	if !stored {
+		return "", false
+	}
+
+	v, ok = val.(string)
+	return v, ok
 }
